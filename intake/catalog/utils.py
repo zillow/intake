@@ -7,7 +7,7 @@
 
 import functools
 import itertools
-from jinja2 import Environment, meta, Undefined
+from jinja2 import Environment, meta, Undefined, StrictUndefined
 import os
 import re
 import shlex
@@ -97,6 +97,7 @@ def _expand(p, context, all_vars, client, getenv, getshell):
         else:
             jinja.globals['client_shell'] = lambda x: _j_passthrough(x, funcname='client_shell')
         ast = jinja.parse(p)
+        jinja.undefined = StrictUndefined  # jinja raises UndefinedError for undefined variables
         all_vars -= meta.find_undeclared_variables(ast)
         return jinja.from_string(p).render(context)
     else:

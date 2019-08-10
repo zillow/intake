@@ -1,5 +1,6 @@
 import os
 import pytest
+
 from intake.catalog.local import LocalCatalogEntry, UserParameter
 from intake.source.base import DataSource
 
@@ -177,12 +178,13 @@ def test_extra_arg():
 
 def test_unknown():
     e = LocalCatalogEntry('', '', driver, args={'arg1': "{{name}}"})
-    s = e()
-    assert s.kwargs['arg1'] == ""
+    from jinja2 import UndefinedError
+    with pytest.raises(UndefinedError):
+        s = e()
 
     # parameter has no default
     up = UserParameter('name')
     e = LocalCatalogEntry('', '', driver, args={'arg1': "{{name}}"},
                           parameters=[up])
-    s = e()
-    assert s.kwargs['arg1'] == ""
+    with pytest.raises(UndefinedError):
+        s = e()

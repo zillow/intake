@@ -86,6 +86,17 @@ def test_nested(catalog1):
     assert catalog1.nested.nested.nested().cat.cat.cat is catalog1
 
 
+def test_nested_cat():
+    from intake.catalog.base import Catalog
+    entry = LocalCatalogEntry(name='trial', description='get this back',
+                              args={'urlpath': 'foo'}, driver='csv')
+    nested_cat = Catalog.from_dict({'trial': entry}, name='mycat')
+    cat = Catalog.from_dict({'level1': nested_cat}, name='level1')
+    assert 'level1' in cat.walk(depth=2)
+    assert 'level1.trial' not in cat.walk(depth=1)
+    assert 'level1.trial' in cat.walk(depth=2)
+
+
 def test_nested_gets_name_from_super(catalog1):
     assert catalog1.name == 'name_in_cat'
     assert 'nested' in catalog1

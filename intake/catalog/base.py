@@ -247,10 +247,11 @@ class Catalog(DataSource):
         out = sofar if sofar is not None else {}
         prefix = [] if prefix is None else prefix
         for name, item in self._entries.items():
-            if item._container == 'catalog' and depth > 1:
+            if (isinstance(item, Catalog) or item._container == 'catalog') and depth > 1:
                 # recurse with default open parameters
                 try:
-                    item().walk(out, prefix + [name], depth-1)
+                    cat_item = item if isinstance(item, Catalog) else item()
+                    cat_item.walk(out, prefix + [name], depth-1)
                 except Exception as e:
                     print(e)
                     pass  # ignore inability to descend
